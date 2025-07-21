@@ -1,0 +1,7 @@
+{
+  "name": "teleprompter",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
