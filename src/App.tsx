@@ -6,14 +6,13 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
-  setupIonicReact,
-  useIonRouter
+  setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { aperture, document, list, square } from 'ionicons/icons';
+import { aperture, document, list } from 'ionicons/icons';
 import { Redirect, Route } from 'react-router-dom';
 import ListMessagesPage from './pages/ListMessagesPage';
-import Tab3 from './pages/RecordMessagePage';
+import RecordMessagePage from './pages/RecordMessagePage';
 import NewMessagePage from './pages/SaveMessage';
 
 /* Core CSS required for Ionic components to work properly */
@@ -72,7 +71,7 @@ const App: React.FC = () => {
             <ListMessagesPage />
           </Route>
           <Route path="/tab3">
-            <Tab3 />
+            <RecordMessagePage />
           </Route>
           <Route exact path="/">
             <Redirect to="/tab1" />
