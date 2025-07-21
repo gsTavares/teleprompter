@@ -1,6 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 
-type MessageSchema = {
+export type MessageSchema = {
     id?: number,
     title: string,
     content: string
@@ -27,13 +27,33 @@ export const initDB = async () => {
 };
 
 export const addMessage = async ({ title, content }: Pick<MessageSchema, "title" | "content">) => {
-  return await db.add('messages', { title, content });
+  if(db) {
+    return await db.add('messages', { title, content });
+  }
 };
+
+export const updateMessage = async ({ title, content, id }: MessageSchema) => {
+  if(db) {
+    return await db.put("messages", { title, content, id});
+  }
+}
 
 export const getMessages = async () => {
-  return await db.getAll('messages');
+  if(db) {
+    return await db.getAll('messages');
+  }
+
+  return [];
 };
 
+export const getMessageById = async (messageId: number) => {
+  if(db) {
+    return await db.get("messages", messageId);
+  }
+}
+
 export const deleteMessage = async (id: number) => {
-  return await db.delete('messages', id);
+  if(db) {
+    return await db.delete('messages', id);
+  }
 };
