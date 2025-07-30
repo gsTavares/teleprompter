@@ -1,5 +1,5 @@
-import { Capacitor } from "@capacitor/core";
-import { Directory, Filesystem } from "@capacitor/filesystem";
+
+import { Filesystem } from "@capacitor/filesystem";
 import {
   IonButton,
   IonCol,
@@ -109,28 +109,27 @@ const RecordMessagePage: React.FC = () => {
     recorder.onstop = async () => {
       const blob = new Blob(recordedChunksRef.current, { type: "video/webm" });
 
-      const platform = Capacitor.getPlatform();
+      // const platform = Capacitor.getPlatform();
 
-      if (platform === 'android') {
+      // if (platform === 'android') {
         // Android nativo: salvar com Filesystem + MediaScanner
         const base64Data = await blobToBase64(blob) as string;
         const fileName = `${selectedMessage?.title}-${Date.now()}.webm`;
 
         await Filesystem.writeFile({
-          path: `DCIM/Teleprompt/${fileName}`,
-          data: base64Data,
-          directory: Directory.ExternalStorage,
+          path: `Movies/Teleprompter/${fileName}`,
+          data: base64Data
         });
 
         alert('📹 Vídeo salvo na galeria!');
-      } else {
-        // Navegador: download com a tag <a>
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "teleprompt-recording.webm";
-        a.click();
-      }
+      // } else {
+      //   // Navegador: download com a tag <a>
+      //   const url = URL.createObjectURL(blob);
+      //   const a = document.createElement("a");
+      //   a.href = url;
+      //   a.download = "teleprompt-recording.webm";
+      //   a.click();
+      // }
     };
 
     recorder.start();
