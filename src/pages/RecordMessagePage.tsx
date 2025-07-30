@@ -1,3 +1,5 @@
+import { Capacitor } from "@capacitor/core";
+import { Directory, Filesystem } from "@capacitor/filesystem";
 import {
   IonButton,
   IonCol,
@@ -49,6 +51,15 @@ const RecordMessagePage: React.FC = () => {
     }
   };
 
+  function blobToBase64(blob: Blob): Promise<string | ArrayBuffer | null> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => resolve(reader.result!.toString().split(',')[1]); // remove o prefixo base64
+      reader.readAsDataURL(blob);
+    });
+  }
+
   // Função que inicia a rolagem somente quando `isScrolling` for true
   const startAutoScroll = () => {
     if (timeoutRef.current) {
@@ -57,7 +68,7 @@ const RecordMessagePage: React.FC = () => {
 
     const scrollStep = () => {
       if (promptRef.current && isScrolling) {
-        promptRef.current.scrollTop += (speed / 20); 
+        promptRef.current.scrollTop += (speed / 20);
         // Como roda a cada ~50ms, ajustamos a quantidade
         // (pixels por segundo) / 20 = pixels por ciclo
       }
@@ -95,13 +106,31 @@ const RecordMessagePage: React.FC = () => {
       if (event.data.size > 0) recordedChunksRef.current.push(event.data);
     };
 
-    recorder.onstop = () => {
+    recorder.onstop = async () => {
       const blob = new Blob(recordedChunksRef.current, { type: "video/webm" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "teleprompt-recording.webm";
-      a.click();
+
+      const platform = Capacitor.getPlatform();
+
+      if (platform === 'android') {
+        // Android nativo: salvar com Filesystem + MediaScanner
+        const base64Data = await blobToBase64(blob) as string;
+        const fileName = `${selectedMessage?.title}-${Date.now()}.webm`;
+
+        await Filesystem.writeFile({
+          path: `DCIM/Teleprompt/${fileName}`,
+          data: base64Data,
+          directory: Directory.ExternalStorage,
+        });
+
+        alert('📹 Vídeo salvo na galeria!');
+      } else {
+        // Navegador: download com a tag <a>
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "teleprompt-recording.webm";
+        a.click();
+      }
     };
 
     recorder.start();
